@@ -109,6 +109,7 @@ encodeToTextBuilder =
     go (Bool b)   = {-# SCC "go/Bool" #-} if b then "true" else "false"
     go (Number s) = {-# SCC "go/Number" #-} fromScientific s
     go (String s) = {-# SCC "go/String" #-} string s
+    go (Ident i)  = {-# SCC "go/Ident" #-} ident i
     go (Array v)
         | V.null v = {-# SCC "go/Array" #-} "[]"
         | otherwise = {-# SCC "go/Array" #-}
@@ -151,6 +152,9 @@ string s = {-# SCC "string" #-} singleton '"' <> quote s <> singleton '"'
         | c < '\x20' = fromString $ "\\u" ++ replicate (4 - length h) '0' ++ h
         | otherwise  = singleton c
         where h = showHex (fromEnum c) ""
+
+ident :: T.Text -> Builder
+ident i = {-# SCC "ident" #-} fromText i 
 
 fromScientific :: Scientific -> Builder
 fromScientific s = formatScientificBuilder format prec s
